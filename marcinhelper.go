@@ -5,16 +5,18 @@ import (
   "strings"
   "bufio"
   "os"
-  "github.com/kyokomi/emoji/v2"
+  "time"
+  "github.com/enescakir/emoji"
 )
 
 func loopAlteracao(textos, opcoes []string, sep string) {
   reader := bufio.NewReader(os.Stdin)
-  emoji.Println(":pencil2: Digite o índice a ser alterado (ou 'kocham Ceci!' para sair):")
+  fmt.Printf("%v \tDigite o índice a ser alterado (ou 'kocham Ceci!' para sair):\n", emoji.Pencil)
   ind, _ :=  reader.ReadString('\n')
   ind =  strings.TrimSpace(ind)
   if strings.EqualFold(ind, "kocham ceci!") {
-    emoji.Println(":heart: Kocham Marcin!!!")
+    fmt.Printf("%v \tKocham Marcin!!!\n", emoji.RedHeart)
+    time.Sleep(2 * time.Second)
     os.Exit(0)
 
   } else {
@@ -25,26 +27,27 @@ func loopAlteracao(textos, opcoes []string, sep string) {
 
     textoToSubs, ok := dict[ind]
     if !ok {
-      emoji.Printf(":poo: O índice fornecido (%s) não existe!\n", ind)
+      fmt.Printf("%v \tO índice fornecido (%s) não existe!\n", emoji.PileOfPoo, ind)
     } else {
-      emoji.Printf(":magnifying_glass_tilted_right: (índice = %s / valor = %s)\n", ind, dict[ind])
-      emoji.Println("  :pencil2: Digite o valor a ser alterado:")
+      fmt.Printf("%v \t(índice = %s / valor = %s)\n", emoji.MagnifyingGlassTiltedRight, ind, dict[ind])
+      fmt.Printf("\t %v \t Digite o valor a ser alterado:\n", emoji.Pencil)
       val, _    := reader.ReadString('\n')
       textosStr := strings.Join(textos, sep)
       textosStr  = strings.Replace(textosStr, textoToSubs, strings.TrimSpace(string(val)), 1)
       textos     = strings.Split(string(textosStr), sep)
-      emoji.Println(":magic_wand: (" + strings.Join(opcoes, sep) + ")(" + textosStr + ")")
+      fmt.Printf("%v \t", emoji.MagicWand)
+      fmt.Println("(" + strings.Join(opcoes, sep) + ")(" + textosStr + ")\n")
     }
     loopAlteracao(textos, opcoes, sep)
   }
 }
 
-func main() {
+func loopInicial() {
   reader := bufio.NewReader(os.Stdin)
-  emoji.Println(":pencil2: Insira a linha a ser alterada: ")
+  fmt.Printf("%v \t Insira a linha a ser alterada: \n", emoji.Pencil)
   linha, _ := reader.ReadString('\n')
 
-  emoji.Println(":pencil2: Insira o separador (ou enter para ','): ")
+  fmt.Printf("%v \t Insira o separador (ou enter para ','): \n", emoji.Pencil)
   sep, _ := reader.ReadString('\n')
   sep = strings.TrimSpace(sep)
   if sep == "" {
@@ -56,22 +59,30 @@ func main() {
   // quebrando 2 partes
   input = string(strings.Replace(input, ")(", "|", -1))
   inputArr := strings.Split(input, "|")
-  // a primeira parte representa as opcoes
-  opcoes := strings.Split(string(inputArr[0]), sep)
-  // a segunda parte representa os valores
-  textos := strings.Split(string(inputArr[1]), sep)
-
-  // print bonitinho
-  emoji.Println(":magnifying_glass_tilted_right:")
-  fmt.Println("(" + strings.Join(opcoes, sep) + ")")
-  fmt.Println("(")
-  for _, item := range textos {
-    fmt.Println(item)
+  if len(inputArr) != 2 {
+      fmt.Printf("%v \tFormato invalido!\n", emoji.PileOfPoo)
+      loopInicial()
+  } else {
+    // a primeira parte representa as opcoes    
+    opcoes := strings.Split(string(inputArr[0]), sep)    
+    // a segunda parte representa os valores    
+    textos := strings.Split(string(inputArr[1]), sep)    
+ 
+    // print bonitinho    
+    fmt.Printf("%v \t", emoji.MagnifyingGlassTiltedRight)    
+    fmt.Println("(" + strings.Join(opcoes, sep) + ")")    
+    fmt.Println("(")                      
+    for _, item := range textos {         
+      fmt.Println(item)                   
+    }                                     
+    fmt.Println(")")                      
+                                        
+    // loop de inputs de alteracao        
+    loopAlteracao(textos, opcoes, sep)  
   }
-  fmt.Println(")")
-
-  // loop de inputs de alteracao
-  loopAlteracao(textos, opcoes, sep)
-
-
 }
+
+func main() {
+  loopInicial()
+}
+
